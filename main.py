@@ -2,58 +2,14 @@ import pygame as pg # type: ignore
 pg.init()
 info = pg.display.Info()
 
-#Colors
-board_color = (0, 0, 0)
-line = "white"
-win_line = (0, 255, 0, 15)
-
-#Display
-width, height = 600, 800
-screen = pg.display.set_mode((width, height), pg.RESIZABLE)
-screen.fill(board_color)
-pg.display.set_caption("Tic Tac Toe!!")
-
-#Board base
-base = pg.Surface((600, 600))
-bg = pg.image.load("assets/bg.jpg").convert_alpha()
-bg = pg.transform.scale(bg, (600, 600))
-bg_rect = base.get_rect(center = (300, 300))
-base.blit(bg, bg_rect)
-
-pg.draw.line(base, line, (200, 0), (200, 600), 6)
-pg.draw.line(base, line, (400, 0), (400, 600), 6)
-pg.draw.line(base, line, (0, 200), (600, 200), 6)
-pg.draw.line(base, line, (0, 400), (600, 400), 6)
-
-#Sounds
-bg_sound = pg.mixer.Sound("assets/space.mp3")
-bg_sound.set_volume(0.3)
-click = pg.mixer.Sound("assets/click.mp3")
-click.set_volume(0.1)
-winner = pg.mixer.Sound("assets/winner.mp3")
-bg_sound.play()
-
-#Fonts and texts
-text_font = pg.font.Font("assets/ScienceGothic.ttf", 50)
-restart_font = pg.font.Font("assets/ScienceGothic.ttf", 30)
-
-x_winner = text_font.render("X wins", True, "white")
-o_winner = text_font.render("O wins", True, "white")
-
-gameover_message = restart_font.render("CLICK ANYWHERE TO RESTART", False, "white")
-gameover_message_rect = gameover_message.get_rect(center = (300, 700))
-
-draw_message = text_font.render("Match DRAWN!", False, "white")
-draw_message_rect = draw_message.get_rect(center = (300, 150))
-
-#Images
-x_img = pg.image.load("assets/cross.png").convert_alpha()
-x_img = pg.transform.scale(x_img, (150, 150))
-
-o_img = pg.image.load("assets/circle.png").convert_alpha()
-o_img = pg.transform.scale(o_img, (150, 150))
-
 #Functions
+def drawline():
+    pg.draw.line(base, line, (200, 0), (200, 600), 6)
+    pg.draw.line(base, line, (400, 0), (400, 600), 6)
+    pg.draw.line(base, line, (0, 200), (600, 200), 6)
+    pg.draw.line(base, line, (0, 400), (600, 400), 6)
+    return
+
 def addXO(pos_x, pos_y, move):
     if move == 1:
         img = x_img
@@ -145,12 +101,56 @@ def reset():
     return True
     
 def outro(move, x, o):
-    x_rect = x.get_rect(center = (300, 150))
-    o_rect = o.get_rect(center = (300, 150))
+    x_rect = x_winner.get_rect(midbottom = (width//2, text_height_bottom))
+    o_rect = o_winner.get_rect(midbottom = (width//2, text_height_bottom))
     if move == 1:
-        base.blit(x, x_rect)
+        screen.blit(x, x_rect)
     else:
-        base.blit(o, o_rect)
+        screen.blit(o, o_rect)
+
+#Colors
+board_color = (10, 10, 10)
+line = "white"
+win_line = (0, 255, 0, 15)
+
+#Display
+width, height = 600, 800
+screen = pg.display.set_mode((width, height), pg.RESIZABLE)
+screen.fill(board_color)
+pg.display.set_caption("Tic Tac Toe!!")
+
+#Board base
+base = pg.Surface((600, 600))
+bg = pg.image.load("assets/bg.jpg").convert_alpha()
+bg = pg.transform.smoothscale(bg, (600, 600))
+bg_rect = base.get_rect(center = (300, 300))
+base.blit(bg, bg_rect)
+drawline()
+
+#Sounds
+bg_sound = pg.mixer.Sound("assets/space.mp3")
+bg_sound.set_volume(0.3)
+click = pg.mixer.Sound("assets/click.mp3")
+click.set_volume(0.1)
+winner = pg.mixer.Sound("assets/winner.mp3")
+bg_sound.play()
+
+#Fonts and texts
+text_font = pg.font.Font("assets/ScienceGothic.ttf", 50)
+restart_font = pg.font.Font("assets/ScienceGothic.ttf", 30)
+
+x_winner = text_font.render("X wins", True, "white")
+o_winner = text_font.render("O wins", True, "white")
+
+gameover_message = restart_font.render("CLICK ANYWHERE TO RESTART", False, "white")
+draw_message = text_font.render("Match DRAWN!", False, "white")
+
+#Images
+x_img = pg.image.load("assets/cross.png").convert_alpha()
+x_img = pg.transform.scale(x_img, (150, 150))
+
+o_img = pg.image.load("assets/circle.png").convert_alpha()
+o_img = pg.transform.smoothscale(o_img, (150, 150))
 
 
 #Main Loop
@@ -164,9 +164,6 @@ running = True
 move = 1
 restart = False
 while running:
-    gm_height = gameover_message_rect.bottom
-    base_rect = base.get_rect(center = (width//2, height//2))
-    gameover_message_rect = gameover_message.get_rect(center = (width//2, gm_height))
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
@@ -174,16 +171,15 @@ while running:
         if event.type == pg.VIDEORESIZE:
             width, height = event.w, event.h
             screen = pg.display.set_mode((width, height), pg.RESIZABLE)
-
+            screen.fill(board_color)
+            
+            
         if event.type == pg.MOUSEBUTTONDOWN:
             click.play()
             if restart:
-                screen = pg.display.set_mode((width, height), pg.RESIZABLE)
                 base.blit(bg, bg_rect)
-                pg.draw.line(base, line, (200, 0), (200, 600), 6)
-                pg.draw.line(base, line, (400, 0), (400, 600), 6)
-                pg.draw.line(base, line, (0, 200), (600, 200), 6)
-                pg.draw.line(base, line, (0, 400), (600, 400), 6)
+                drawline()
+                screen.fill(board_color)
                 restart = False
             else:
                 pos = pg.mouse.get_pos()
@@ -196,19 +192,26 @@ while running:
                     if gameover:
                         outro(move, x_winner, o_winner)
                         winner.play()
-                        base.blit(gameover_message, gameover_message_rect)
+                        screen.blit(gameover_message, gameover_message_rect)
                         restart = reset()
+                        pg.display.update()
                     
                     elif isFilled(board):
-                        base.blit(draw_message, draw_message_rect)
+                        screen.blit(draw_message, draw_text_rect)
                         winner.play()
-                        base.blit(gameover_message, gameover_message_rect)
+                        screen.blit(gameover_message, gameover_message_rect)
                         restart = reset()
+                        pg.display.update()
                     
                     if move == 1: move = 0
                     else: move = 1
 
-    screen.fill(board_color)
+    base_rect = base.get_rect(center = (width//2, height//2))
+    gm_height_top = base_rect.bottom
+    text_height_bottom = base_rect.top
+    gameover_message_rect = gameover_message.get_rect(midtop = (width//2, gm_height_top))
+    draw_text_rect = draw_message.get_rect(midbottom =(width//2, text_height_bottom))
+
     screen.blit(base, base_rect)
     pg.display.update()
 
