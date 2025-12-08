@@ -116,8 +116,11 @@ win_line = (0, 255, 0, 15)
 #Display
 width, height = 600, 800
 screen = pg.display.set_mode((width, height), pg.RESIZABLE)
-screen.fill(board_color)
+bg_image = pg.image.load("assets/background.png").convert_alpha()
+icon = pg.image.load("assets/icon.png").convert_alpha()
+screen.blit(bg_image, (0,0))
 pg.display.set_caption("Tic Tac Toe!!")
+pg.display.set_icon(icon)
 
 #Board base
 base = pg.Surface((600, 600))
@@ -147,7 +150,7 @@ draw_message = text_font.render("Match DRAWN!", False, "white")
 
 #Images
 x_img = pg.image.load("assets/cross.png").convert_alpha()
-x_img = pg.transform.scale(x_img, (150, 150))
+x_img = pg.transform.smoothscale(x_img, (150, 150))
 
 o_img = pg.image.load("assets/circle.png").convert_alpha()
 o_img = pg.transform.smoothscale(o_img, (150, 150))
@@ -171,7 +174,8 @@ while running:
         if event.type == pg.VIDEORESIZE:
             width, height = event.w, event.h
             screen = pg.display.set_mode((width, height), pg.RESIZABLE)
-            screen.fill(board_color)
+            bg_image = pg.transform.smoothscale(bg_image, (width, height))
+            screen.blit(bg_image, (0,0))
             
             
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -179,7 +183,7 @@ while running:
             if restart:
                 base.blit(bg, bg_rect)
                 drawline()
-                screen.fill(board_color)
+                screen.blit(bg_image, (0,0))
                 restart = False
             else:
                 pos = pg.mouse.get_pos()
